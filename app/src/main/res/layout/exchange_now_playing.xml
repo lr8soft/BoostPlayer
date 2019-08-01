@@ -48,6 +48,14 @@
         app:layout_constraintTop_toBottomOf="@id/nowplaying_detail_plane"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nowplaying_music_progressbar"/>
+    <SeekBar
+        android:id="@+id/nowplaying_music_progressbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/nowplaying_music_image"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/nowplaying_recycle_setting_plane"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/nowplaying_recycle_setting_plane"
@@ -55,10 +63,20 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.06"
-        app:layout_constraintTop_toBottomOf="@id/nowplaying_music_image"
+        app:layout_constraintTop_toBottomOf="@id/nowplaying_music_progressbar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/nowplaying_playing_setting_plane">
+        <ImageButton
+            android:id="@+id/nowplaying_add_to_fav"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/nowplaying_add_to_list"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/nowplaying_recyle_order"
+            app:layout_constraintDimensionRatio="1"/>
         <ImageButton
             android:id="@+id/nowplaying_recyle_order"
             android:layout_width="0dp"
@@ -66,7 +84,7 @@
             android:background="@drawable/nowplaying_order_play_btn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/nowplaying_add_to_fav"
             app:layout_constraintRight_toLeftOf="@id/nowplaying_recyle_single"
             app:layout_constraintDimensionRatio="1"/>
         <ImageButton
