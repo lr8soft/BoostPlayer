@@ -1,6 +1,6 @@
 package com.lrsoft.boost_xplayer.ExchangeContent;
 
-import android.media.MediaPlayer;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +11,8 @@ import android.widget.ImageView;
 import androidx.fragment.app.Fragment;
 
 import com.lrsoft.boost_xplayer.MainActivity;
-import com.lrsoft.boost_xplayer.MusicContent.MusicHelper;
-import com.lrsoft.boost_xplayer.PlayingStaticInfo;
+import com.lrsoft.boost_xplayer.MusicContent.MusicItem;
+import com.lrsoft.boost_xplayer.PlayerService;
 import com.lrsoft.boost_xplayer.R;
 public class NowPlayingContent extends Fragment {
     private MainActivity mainActivity;
@@ -30,17 +30,31 @@ public class NowPlayingContent extends Fragment {
         btnPauseResume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(PlayingStaticInfo.mainPlayer==null){
-                    MusicHelper musicHelper = new MusicHelper(mainActivity);
-                    PlayingStaticInfo.mainPlayer = musicHelper.loadMusicFromPath("eternal_moment.mp3");
-                }
-                if(PlayingStaticInfo.mainPlayer.isPlaying()){
-                    PlayingStaticInfo.mainPlayer.pause();
+                Intent intent = new Intent(mainActivity, PlayerService.class);
+                if(PlayerService.getIsPlaying()){
                     btnPauseResume.setBackgroundResource(R.drawable.nowplaying_resume);
+                    intent.putExtra("PlayerAction","pause");
                 }else{
-                    PlayingStaticInfo.mainPlayer.start();
                     btnPauseResume.setBackgroundResource(R.drawable.nowplaying_pause);
+                    intent.putExtra("PlayerAction","resume");
                 }
+                mainActivity.startService(intent);
+            }
+        });
+        btnPreviousMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mainActivity, PlayerService.class);
+                intent.putExtra("PlayerAction","previous");
+                mainActivity.startService(intent);
+            }
+        });
+        btnNextMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mainActivity, PlayerService.class);
+                intent.putExtra("PlayerAction","next");
+                mainActivity.startService(intent);
             }
         });
         return  view;
@@ -49,13 +63,11 @@ public class NowPlayingContent extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(PlayingStaticInfo.mainPlayer!=null){
-            ImageButton btnPauseResume = mainActivity.findViewById(R.id.nowplaying_playing_pause_resume);
-            if(PlayingStaticInfo.mainPlayer.isPlaying()){
-                btnPauseResume.setBackgroundResource(R.drawable.nowplaying_pause);
-            }else{
-                btnPauseResume.setBackgroundResource(R.drawable.nowplaying_resume);
-            }
+        ImageButton btnPauseResume = mainActivity.findViewById(R.id.nowplaying_playing_pause_resume);
+        if(PlayerService.getIsPlaying()){
+            btnPauseResume.setBackgroundResource(R.drawable.nowplaying_pause);
+        }else{
+            btnPauseResume.setBackgroundResource(R.drawable.nowplaying_resume);
         }
     }
 
