@@ -48,6 +48,9 @@ public class PlayerService extends Service {
             return true;
         }
     }
+    public static MusicItem getMediaNowPlaying(){
+        return mediaNowPlaying;
+    }
     public static boolean getIsPlaying(){
         return isPlaying;
     }

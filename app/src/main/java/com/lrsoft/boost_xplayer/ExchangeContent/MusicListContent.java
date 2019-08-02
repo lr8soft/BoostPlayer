@@ -25,6 +25,7 @@ public class MusicListContent extends Fragment {
     public static MenuItemAdapter menuItemAdapter = null;
     private static List<MenuListItem> menuItemList = new ArrayList<>();
     private static ScannerContent scannerContent = null;
+    private static FavouriteContent favouriteContent = null;
     public MusicListContent(MainActivity callback){
         mainActivity = callback;
     }
@@ -54,7 +55,14 @@ public class MusicListContent extends Fragment {
                         transaction.addToBackStack(null);
                         transaction.commit();
                     }else if(item.getTabName().equals("我的收藏")){
-
+                        FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
+                        FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        if(favouriteContent==null){
+                            favouriteContent = new FavouriteContent(mainActivity);
+                        }
+                        transaction.replace(R.id.homepage_detail_content,favouriteContent);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
                     }
                 }
             }
