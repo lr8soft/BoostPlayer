@@ -34,14 +34,17 @@ public class MusicScanner extends Thread{
     private void startScanner(final File[] file){
         for(int i=0 ; file!= null && i<file.length ;i++) {
             //判读是否文件以及文件后缀名
-            if(file[i].isFile() && file[i].canRead() && file[i].length()/1024.0/1024.0 >= leastMB &&(file[i].getName().endsWith("mp3") ||file[i].getName().endsWith("ogg")||file[i].getName().endsWith("wav")||
-                    file[i].getName().endsWith("flac") )){
+            if(file[i].isFile() && file[i].canRead() && file[i].length()/1024.0/1024.0 >= leastMB &&
+                    (file[i].getName().endsWith("mp3") ||
+                            file[i].getName().endsWith("ogg")||
+                            file[i].getName().endsWith("wav")||
+                            file[i].getName().endsWith("flac")||
+                            file[i].getName().endsWith("aac")
+                    )){
                 MusicItem item = new MusicItem();
                 item.setMusicPath(file[i].getPath());
                 item.setMusicName(file[i].getName());
                 musicList.add(item);
-                //test
-                PlayerService.addAudio(item);
                 Log.e("startScanner",item.getMusicPath()+" size:"+file[i].length()/1024.0/1024.0);
             }
             //如果是文件夹，递归扫描
