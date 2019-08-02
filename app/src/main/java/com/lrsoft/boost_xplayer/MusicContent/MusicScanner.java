@@ -1,9 +1,17 @@
 package com.lrsoft.boost_xplayer.MusicContent;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
+
+import com.lrsoft.boost_xplayer.ExchangeContent.MusicListAdapter.MenuListItem;
 import com.lrsoft.boost_xplayer.ExchangeContent.NowPlayingContent;
 import com.lrsoft.boost_xplayer.PlayerService;
+import com.lrsoft.boost_xplayer.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,19 +20,28 @@ import java.util.List;
 public class MusicScanner extends Thread{
     private String scannerPath = "/sdcard";
     private float leastMB = 0.2f;
-    private static List<MusicItem> musicList = new ArrayList<>();
+    private static ArrayAdapter<MenuListItem> musicList = null;
 
     public MusicScanner(){}
     public MusicScanner(String startScannerPath, float scannerLeastSize){
         scannerPath = startScannerPath;
         scannerLeastSize = leastMB;
     }
-    public List<MusicItem> getMusicList(){
+    public void setAdapter(ArrayAdapter<MenuListItem> list){
+        musicList = list;
+    }
+    public ArrayAdapter<MenuListItem> getMusicList(){
         return musicList;
     }
     @Override
     public void run() {
-        EasyScanner();
+        if(musicList==null)
+            throw new NullPointerException("Have't set the adapter");
+        else{
+            Message msg = mHandler.obtainMessage(1);
+            msg.sendToTarget();
+            EasyScanner();
+        }
     }
 
     private void EasyScanner(){
@@ -41,10 +58,15 @@ public class MusicScanner extends Thread{
                             file[i].getName().endsWith("flac")||
                             file[i].getName().endsWith("aac")
                     )){
+                MenuListItem Oitem = new MenuListItem();
                 MusicItem item = new MusicItem();
                 item.setMusicPath(file[i].getPath());
                 item.setMusicName(file[i].getName());
-                musicList.add(item);
+                Oitem.setMusicItem(item);
+                Oitem.setTabName(file[i].getName());
+                Oitem.setTabIcon(R.drawable.now_playing_default_image);
+                Message msg = mHandler.obtainMessage(0, Oitem);
+                msg.sendToTarget();
                 Log.e("startScanner",item.getMusicPath()+" size:"+file[i].length()/1024.0/1024.0);
             }
             //如果是文件夹，递归扫描
@@ -61,4 +83,20 @@ public class MusicScanner extends Thread{
         }
 
     }
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch(msg.what){
+                case 0:
+                    MenuListItem item = (MenuListItem)msg.obj;
+                    musicList.add(item);
+                    musicList.notifyDataSetChanged();
+                    break;
+                case 1:
+                    musicList.clear();
+                    musicList.notifyDataSetChanged();
+                    break;
+            }
+        }
+    };
 }

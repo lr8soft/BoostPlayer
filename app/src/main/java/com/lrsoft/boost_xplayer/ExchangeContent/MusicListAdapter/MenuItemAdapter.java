@@ -14,6 +14,10 @@ import java.util.List;
 
 public class MenuItemAdapter extends ArrayAdapter<MenuListItem> {
     private int resid;
+    public enum ListType{
+        MenuItem, MusicItem
+    };
+    private ListType adapterType = ListType.MusicItem;
     public MenuItemAdapter(Context context, int rid, List<MenuListItem> list){
         super(context, rid, list);
         resid = rid;
@@ -30,6 +34,12 @@ public class MenuItemAdapter extends ArrayAdapter<MenuListItem> {
             image.setImageBitmap(item.getBitmap());
         }
         title.setText(item.getTabName());
-        return super.getView(position, convertView, parent);
+        return view;
+    }
+    public ListType getAdapterType(){
+        return adapterType;
+    }
+    public void setAdapterType(ListType type){
+        adapterType = type;
     }
 }

@@ -18,7 +18,11 @@ import com.lrsoft.boost_xplayer.MusicContent.MusicScanner;
 public class MainActivity extends AppCompatActivity {
     public static MainActivity tempThis;
     public AlertDialog.Builder dialog;
-    private MusicScanner musicScanner;
+
+    public static ImageButton btnList = null;
+    public static ImageButton btnNowplay = null;
+    public static ImageButton btnSearch = null;
+    public static ImageButton btnSetting = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,22 +32,22 @@ public class MainActivity extends AppCompatActivity {
         if(getSupportActionBar()!=null){
             getSupportActionBar().hide();
         }
-        musicScanner = new MusicScanner();
-        musicScanner.start();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        ImageButton btnList = findViewById(R.id.homepage_detail_playlist);
-        ImageButton btnNowplay = findViewById(R.id.homepage_detail_nowplay);
-        ImageButton btnSearch = findViewById(R.id.homepage_detail_search);
-        ImageButton btnSetting = findViewById(R.id.homepage_detail_setting);
         FunctionButtonContent content = new FunctionButtonContent(this);
+        btnList = findViewById(R.id.homepage_detail_playlist);
+        btnNowplay = findViewById(R.id.homepage_detail_nowplay);
+        btnSearch = findViewById(R.id.homepage_detail_search);
+        btnSetting = findViewById(R.id.homepage_detail_setting);
         btnList.setOnClickListener(content);
         btnNowplay.setOnClickListener(content);
         btnSearch.setOnClickListener(content);
         btnSetting.setOnClickListener(content);
+        btnList.callOnClick();
     }
     public void setTitle(String title){
         TextView texTitle = findViewById(R.id.homepage_title_titleTextView);
