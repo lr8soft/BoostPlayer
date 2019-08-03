@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -76,6 +77,8 @@ public class FavouriteContent extends Fragment {
                 MenuListItem item = menuItemAdapter.getItem(i);
                 MainActivity.btnNowplay.callOnClick();
                 PlayerService.setAudioPlay(item.getMusicItem());
+                PlayerService.setMusicListByMenuListItem(menuItemList);
+                Toast.makeText(mainActivity, "已将我的收藏列表加载到播放列表中！",Toast.LENGTH_SHORT).show();
             }
         });
         return view;

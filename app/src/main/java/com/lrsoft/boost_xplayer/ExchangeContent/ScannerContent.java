@@ -75,7 +75,6 @@ public class ScannerContent extends Fragment {
                 MenuListItem item = menuItemAdapter.getItem(i);
                 MainActivity.btnNowplay.callOnClick();
                 PlayerService.setAudioPlay(item.getMusicItem());
-
             }
         });
         return view;

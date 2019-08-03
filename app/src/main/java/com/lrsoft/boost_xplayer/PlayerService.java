@@ -5,29 +5,39 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.lrsoft.boost_xplayer.ExchangeContent.MusicListAdapter.MenuListItem;
 import com.lrsoft.boost_xplayer.MusicContent.MusicItem;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class PlayerService extends Service {
+    public enum PlayingStyle{
+        SingleRecycle, ListRecycle, RandomPlay
+    };
+    private static PlayingStyle playingRecycleType = PlayingStyle.ListRecycle;
     private static List<MusicItem> musicItemList = new ArrayList<>();
     private static MediaPlayer mediaPlayer = null;
     private static MusicItem mediaNowPlaying = null;
     private static boolean isPlaying = false;
+    private static Thread updateThread = null;
+    public static void setPlayingRecycleType(PlayingStyle style){ playingRecycleType = style; }
     public static boolean addAudio(MusicItem item){
         return musicItemList.add(item);
     }
@@ -36,8 +46,40 @@ public class PlayerService extends Service {
     }
     public static boolean setAudioPlay(MusicItem item){
         Release();
-        MusicHelper musicHelper = new MusicHelper(MainActivity.tempThis);
+        final MusicHelper musicHelper = new MusicHelper(MainActivity.tempThis);
+        mediaPlayer = null;
         mediaPlayer = musicHelper.loadMusicFromPath(item.getMusicPath());
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                Log.i( "onCompletion: ", "finish "+mediaPlayer.getDuration());
+                switch (playingRecycleType){
+                    case RandomPlay:
+                        Random random = new Random();
+                        int nexti = random.nextInt(musicItemList.size());
+                        setAudioPlay(musicItemList.get(nexti));
+                        Resume();
+                        setMusicInfo(musicItemList.get(nexti));
+                        break;
+                    case ListRecycle:
+                        int nowIndex = musicItemList.indexOf(mediaNowPlaying);
+                        int nextIndex;
+                        if(nowIndex + 1 < musicItemList.size()){
+                            nextIndex = nowIndex + 1;
+                        }else{
+                            nextIndex = 0;
+                        }
+                        setAudioPlay(musicItemList.get(nextIndex));
+                        Resume();
+                        setMusicInfo(musicItemList.get(nextIndex));
+                        break;
+                    case SingleRecycle:
+                        mediaPlayer.start();
+                        setMusicInfo(getMediaNowPlaying());
+                        break;
+                }
+            }
+        });
         if(mediaPlayer==null){
             return false;
         }else{
@@ -47,6 +89,23 @@ public class PlayerService extends Service {
             mediaNowPlaying = item;
             return true;
         }
+    }
+    public static void setMusicListByMenuListItem(List<MenuListItem> list){
+        if(!list.isEmpty()){
+            musicItemList.clear();
+            for(MenuListItem item : list){
+                musicItemList.add(item.getMusicItem());
+            }
+        }
+    }
+    public static void setMusicListByMusicItem(List<MusicItem> list){
+        if(!list.isEmpty()){
+            musicItemList.clear();
+            musicItemList.addAll(list);
+        }
+    }
+    public static MediaPlayer getMediaPlayer(){
+        return mediaPlayer;
     }
     public static MusicItem getMediaNowPlaying(){
         return mediaNowPlaying;
@@ -155,9 +214,16 @@ public class PlayerService extends Service {
         TextView title = MainActivity.tempThis.findViewById(R.id.nowplaying_music_name);
         TextView author = MainActivity.tempThis.findViewById(R.id.nowplaying_detail_info);
         ImageView image = MainActivity.tempThis.findViewById(R.id.nowplaying_music_image);
-        title.setText(info.getMusicName());
-        author.setText(info.getAlbumName()+" "+info.getAuthorName());
-        image.setImageResource(R.drawable.now_playing_default_image);
+        SeekBar seekBar = MainActivity.tempThis.findViewById(R.id.nowplaying_music_progressbar);
+        try{
+            title.setText(info.getMusicName());
+            author.setText(info.getAlbumName()+" "+info.getAuthorName());
+            image.setImageResource(R.drawable.now_playing_default_image);
+            seekBar.setProgress(0);
+            seekBar.setMax(PlayerService.getMediaPlayer().getDuration());
+        }catch (Exception expt){
+            Log.i("setMusicInfo: ",expt.getMessage());
+        }
     }
 }
 class MusicHelper {
