@@ -29,6 +29,7 @@ public class NowPlayingContent extends Fragment {
     public static ImageButton btnNextMusic = null;
     public static ImageButton btnAddToFav = null;
     private static SeekBar seekBar;
+    private Timer timer = null;
     public NowPlayingContent(MainActivity callback){
         mainActivity = callback;
     }
@@ -147,8 +148,11 @@ public class NowPlayingContent extends Fragment {
             SeekBar seekBar = mainActivity.findViewById(R.id.nowplaying_music_progressbar);
             seekBar.setMax(PlayerService.getMediaPlayer().getDuration());
         }
-        Timer timer = new Timer();
-        timer.schedule(timertask, 0, 1000);
+        if(timer==null){
+            timer = new Timer();
+            timer.schedule(timertask, 0, 500);
+        }
+
     }
     private TimerTask timertask = new TimerTask(){
         public void run() {
